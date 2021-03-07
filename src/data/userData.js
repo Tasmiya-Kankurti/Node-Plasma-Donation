@@ -1,5 +1,6 @@
-var profile = [
+var user = [
     {
+        password: "123",
         name: "Tasmiya Kankurti",
         email: "tasmiyakankurti@gmail",
         mobile: 8208372937,
@@ -21,6 +22,7 @@ var profile = [
         }
     },
     {
+        password: "123",
         name: "Tanay Vartak",
         email: "tanayvartak@gmail",
         mobile: 9673865870,
@@ -42,3 +44,5 @@ var profile = [
         }
     }
 ]
+
+module.exports = user
