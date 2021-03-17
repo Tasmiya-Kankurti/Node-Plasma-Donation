@@ -9,7 +9,7 @@ var user = [
         bloodGroup: "O+",
         address:{
             country: "India",
-            address: "Paccha Peth",	
+            area: "Paccha Peth",	
             city: "Solapur",	
             state: "Maharashtra",	
             pincode: 413005,
@@ -31,7 +31,7 @@ var user = [
         bloodGroup: "A+",
         address:{
             country: "India",
-            address: "Bibwewadi",	
+            area: "Bibwewadi",	
             city: "Pune",	
             state: "Maharashtra",	
             pincode: 411007,

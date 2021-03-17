@@ -1,13 +1,27 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const mongoose = require('mongoose')
+const mongoURL = require('./config/').mongoURL
+
 const user = require('./src/routes/userRoute')
 const post = require('./src/routes/postRoute')
 const story = require('./src/routes/storyRoute')
 const request = require('./src/routes/requestRoute')
+
 const app = express()
 
 app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
+
+mongoose.connect(mongoURL, {
+    useNewUrlParser: true,
+    useFindAndModify: false, 
+    useUnifiedToposlogy: true,
+}).then(()=>{
+    console.log("Database Successfully connected :)")
+}).catch((error)=>{
+    console.log(`ERROR: ${error.message}`);
+})
 
 const PORT = 3000
 
