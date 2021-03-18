@@ -3,6 +3,7 @@ const isLoggedIn = require('../middleware')
 // const user = require('../data/userData')
 const User = require('../models/User') 
 const router = express.Router()
+const bcrypt = require('bcrypt')
 
 router.get('/', (req, res) => {
     User.find().then((data) => {
@@ -15,46 +16,50 @@ router.get('/', (req, res) => {
 })
 
 router.post('/createuser', (req, res) => {
-    User.find({email: req.body.email}).then((data) => {
-        if(data.length !== 0){
+    User.findOne({email: req.body.email}).then((data) => {
+        if(data){
             res.send({
                 message: "Donor Account already exits from this email! "
        
             })
         } else{
-            const user = new User({
-                password: req.body.password,
-                name: req.body.name,
-                email: req.body.email,
-                mobile: req.body.mobile,
-                age: req.body.age,
-                weight: req.body.weight,
-                bloodGroup: req.body.bloodGroup,
-                address:{
-                    country: req.body.address.country,
-                    area: req.body.address.area,	
-                    city: req.body.address.city,	
-                    state: req.body.address.state,	
-                    pincode: req.body.address.pincode,
-                },
-                gender: req.body.gender,
-                child: req.body.child,
-                reportsDates:{
-                    first: req.body. reportsDates.first,
-                    second: req.body. reportsDates.second
-                }
-            })
-        
-            user.save().then((data) => {
-                res.send({
-                    message: "Donor Account created succesfully! ",
-                    ...data._doc
-                })
-            }).catch((error) => {
-                res.send({
-                    message: error.message
-                })
-            })
+                bcrypt.genSalt(10).then((salt) => {
+                    return bcrypt.hash(req.body.password, salt)
+                }).then((hash) => {
+                    const user = new User({
+                        password: hash,
+                        name: req.body.name,
+                        email: req.body.email,
+                        mobile: req.body.mobile,
+                        age: req.body.age,
+                        weight: req.body.weight,
+                        bloodGroup: req.body.bloodGroup,
+                        address:{
+                            country: req.body.address.country,
+                            area: req.body.address.area,	
+                            city: req.body.address.city,	
+                            state: req.body.address.state,	
+                            pincode: req.body.address.pincode,
+                        },
+                        gender: req.body.gender,
+                        child: req.body.child,
+                        reportsDates:{
+                            first: req.body. reportsDates.first,
+                            second: req.body. reportsDates.second
+                        }
+                    })
+                
+                    return user.save()
+                }).then((data) => {
+                    res.send({
+                        message: "Donor Account created succesfully! ",
+                        ...data._doc
+                    })
+                }).catch((error) => {
+                    res.send({
+                        message: error.message
+                    })
+                })    
 
         }
 
