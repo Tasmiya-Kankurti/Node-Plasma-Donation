@@ -1,6 +1,7 @@
 const express = require('express')
 // const post = require('../data/postData')
-const Post = require('../models/postModel')
+const Post = require('../models/Post')
+const isLoggedIn = require('../middleware')
 const router = express.Router()
 
 router.get('/', (req, res) => {
@@ -13,7 +14,7 @@ router.get('/', (req, res) => {
     })
 })
 
-router.post('/createpost', (req, res) => {
+router.post('/createpost',isLoggedIn, (req, res) => {
     Post.find({email: req.body.email}).then((data) => {
         if(data.length !== 0){
             res.send({
@@ -45,7 +46,7 @@ router.post('/createpost', (req, res) => {
     
 })
 
-router.delete('/deletepost', (req, res) => {
+router.delete('/deletepost', isLoggedIn, (req, res) => {
     Post.remove({email: req.body.email}).then((data) => {
         res.send({
             message: "Post deleted successfully! "
@@ -57,7 +58,7 @@ router.delete('/deletepost', (req, res) => {
     })
 })
 
-router.put('/updatepost', (req,res) => {
+router.put('/updatepost', isLoggedIn, (req,res) => {
     Post.updateOne(
         {
             email: req.body.email

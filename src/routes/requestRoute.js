@@ -2,8 +2,8 @@ const express = require('express')
 // const post = require('../data/postData')
 // const { push } = require('../data/requestData')
 // const request = require('../data/requestData')
-const Request = require("../models/requestModel")
-const Post = require('../models/postModel')
+const Request = require("../models/Request")
+const Post = require('../models/Post')
 const router = express.Router()
 
 router.get('/', (req, res) => {

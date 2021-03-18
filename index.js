@@ -7,6 +7,7 @@ const user = require('./src/routes/userRoute')
 const post = require('./src/routes/postRoute')
 const story = require('./src/routes/storyRoute')
 const request = require('./src/routes/requestRoute')
+const auth = require('./src/routes/authRoute')
 
 const app = express()
 
@@ -33,6 +34,7 @@ app.use('/user', user)
 app.use('/post', post)
 app.use('/story', story)
 app.use('/request',request)
+app.use('/auth',auth)
 
 app.listen(PORT, () => {
     console.log(`The Server is running on port: ${PORT}`)

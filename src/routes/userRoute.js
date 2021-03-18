@@ -1,6 +1,7 @@
 const express = require('express')
+const isLoggedIn = require('../middleware')
 // const user = require('../data/userData')
-const User = require('../models/userModel') 
+const User = require('../models/User') 
 const router = express.Router()
 
 router.get('/', (req, res) => {
@@ -61,7 +62,7 @@ router.post('/createuser', (req, res) => {
     
 })
 
-router.delete('/deleteuser', (req, res) => {
+router.delete('/deleteuser', isLoggedIn, (req, res) => {
     User.remove({email: req.body.email}).then((data) => {
         res.send({
             message: "Donor Account deleted succesfully! "
@@ -73,7 +74,7 @@ router.delete('/deleteuser', (req, res) => {
     })
 })
 
-router.put('/updateuser', (req,res) => {
+router.put('/updateuser', isLoggedIn, (req,res) => {
     User.updateOne(
         {
             email: req.body.email
@@ -84,9 +85,14 @@ router.put('/updateuser', (req,res) => {
             }
         }
     ).then((data)=>{
-        User.find({email: req.body.email}).then((data) => {
-            if(data.length !== 0)
+        User.findOne({email: req.body.email}).then((data) => {
+            if(data !== null)
                 res.send(data)
+            else{
+                res.send({
+                    message: "User not found !"
+                })
+            }
     })
     }).catch((error)=>{
         res.send({
