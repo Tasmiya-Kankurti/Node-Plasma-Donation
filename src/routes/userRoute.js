@@ -23,45 +23,45 @@ router.post('/createuser', (req, res) => {
        
             })
         } else{
-                bcrypt.genSalt(10).then((salt) => {
-                    return bcrypt.hash(req.body.password, salt)
-                }).then((hash) => {
-                    const user = new User({
-                        password: hash,
-                        name: req.body.name,
-                        email: req.body.email,
-                        mobile: req.body.mobile,
-                        age: req.body.age,
-                        weight: req.body.weight,
-                        bloodGroup: req.body.bloodGroup,
-                        address:{
-                            country: req.body.address.country,
-                            area: req.body.address.area,	
-                            city: req.body.address.city,	
-                            state: req.body.address.state,	
-                            pincode: req.body.address.pincode,
-                        },
-                        gender: req.body.gender,
-                        child: req.body.child,
-                        reportsDates:{
-                            first: req.body. reportsDates.first,
-                            second: req.body. reportsDates.second
-                        }
-                    })
-                
-                    return user.save()
-                }).then((data) => {
-                    res.send({
-                        message: "Donor Account created succesfully! ",
-                        ...data._doc
-                    })
-                }).catch((error) => {
-                    res.send({
-                        message: error.message
-                    })
-                })    
+            bcrypt.genSalt(10).then((salt) => {
+                return bcrypt.hash(req.body.password, salt)
+            }).then((hash) => {
+                const user = new User({
+                    password: hash,
+                    name: req.body.name,
+                    email: req.body.email,
+                    mobile: req.body.mobile,
+                    age: req.body.age,
+                    weight: req.body.weight,
+                    bloodGroup: req.body.bloodGroup,
+                    address:{
+                        country: req.body.address.country,
+                        area: req.body.address.area,	
+                        city: req.body.address.city,	
+                        state: req.body.address.state,	
+                        pincode: req.body.address.pincode,
+                    },
+                    gender: req.body.gender,
+                    child: req.body.child,
+                    reportsDates:{
+                        first: req.body. reportsDates.first,
+                        second: req.body. reportsDates.second
+                    }
+                })
 
-        }
+                return user.save()
+            }).then((data) => {
+                res.send({
+                    message: "Donor Account created succesfully! ",
+                    ...data._doc
+                })
+            }).catch((error) => {
+                res.send({
+                    message: error.message
+                })
+            })    
+
+    }
 
     })
     
@@ -106,6 +106,34 @@ router.put('/updateuser', isLoggedIn, (req,res) => {
     })
 })
 
+router.put('/forgetpassword', (req, res) => {
+    bcrypt.genSalt(10).then((salt) => {
+        return bcrypt.hash(req.body.password, salt)
+    }).then((hash) => {
+        User.updateOne(
+            {
+                email: req.body.email
+            },
+            {
+                $set: {
+                    password: hash
+                }
+            }
+        ).then((data) => {
+            res.send({
+                message: "Password Updated"
+            }).catch((error) => {
+                res.send({
+                    message: error.message
+                })
+            })
+        })
+    }).catch((error) => {
+        message: error.message
+    }) 
+     
+    
+})
 
 // router.get('/', (req, res) => {
 //     res.send(user)
