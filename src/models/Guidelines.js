@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const guidelinesSchema = new Schema({
-    data: {
+    info: {
         type: String,
         required: true
     }
@@ -10,5 +10,4 @@ const guidelinesSchema = new Schema({
 })
 
 const guidelines = mongoose.model("guideline", guidelinesSchema)
-
 module.exports = guidelines

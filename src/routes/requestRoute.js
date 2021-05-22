@@ -1,88 +1,112 @@
 const express = require('express')
-// const post = require('../data/postData')
-// const { push } = require('../data/requestData')
-// const request = require('../data/requestData')
-const Request = require("../models/Request")
-const Post = require('../models/Post')
 const router = express.Router()
+const Request = require('../models/Request')
+const Donor =require('../models/Donor')
+const isLoggedIn = require('../middleware')
+// const request = require('../data/requestData')
 
 router.get('/', (req, res) => {
     Request.find().then((data) => {
         res.send(data)
     }).catch((error) => {
-        res.send({
-            message: error.message,
+        res.status(500).send({
+            error: {
+                message: error.message
+            }
         })
     })
 })
 
-router.get('/search', (req,res) => {
-    Post.find({bloodGroup: req.body.bloodGroup}).then((data)=>{
+router.get('/myrequest', isLoggedIn, (req, res) => {
+    Request.findOne({receiverId: req.body.id}).populate('receiverId',['name', 'email','avatar','requiredBG','cityState','mobile']).then((data) => {
+        // console.log(data)
         res.send(data)
-    }).catch((error)=>{
-        res.send({
-            message: "Sorry we dont have the required plasma donor.. You can add a request" 
+    }).catch((error) => {
+        res.status(500).send({
+            error: {
+                message: error.message
+            }
+        })
+    })
+})
+
+router.get('/requestbyid/:reqId', (req, res) => {
+    Request.findOne({_id: req.params.reqId}).populate('receiverId',['name', 'email','avatar','requiredBG','cityState','mobile']).then((data) => {
+        if(data){
+            // console.log(data)
+            res.send(data)
+        } else {
+            res.status(400).send({
+                error: {
+                    message: "wrong request id!"
+                }
+            })
+        }
+    }).catch((error) => {
+        res.status(500).send({
+            error: {
+                message: error.message   
+            }
+        })
+    })
+})
+
+router.get('/search/:reqBG', (req,res) => {
+    Donor.find({bloodGroup: req.params.reqBG}).then((data)=>{
+        if(data){
+            res.send(data)
+        } else {
+            res.send("Sorry we dont have the required plasma donor.. You can add a request")
+        }
+        
+    }).catch((error) => {
+        res.status(500).send({
+            error: {
+                message: error.message   
+            }
         })
     })
 
 })
 
-router.post('/createrequest', (req, res) => {
-
-    const request = new Request({
-        name: req.body.name,
-        email: req.body.email,
-        address: req.body.address,
-        bloodGroup: req.body.bloodGroup,
+router.post('/createrequest',isLoggedIn, (req, res) => {
+    Request.findOne({receiverId: req.body.id}).then((data) => {
+        if(data){
+            res.send({
+                message: "You have already requested for donor!"
+            })
+        } else {
+            const request = new Request({
+                receiverId: req.body.id
+            })    
+            request.save().then((data) => {
+                res.send({
+                    message: "Request added successfully!",
+                    ...data._doc
+                })
+            }).catch((error) => {
+                res.status(500).send({
+                    error: {
+                        message: error.message
+                    }
+                })
+            })
+        }
     })
+})
 
-    request.save().then((data) => {
+router.delete('/deleterequest', isLoggedIn, (req, res) => {
+    Request.remove({receiverId: req.body.id}).then((data) => {
         res.send({
-            message: "Request added successfully! ",
-            ...data._doc
+            message: "request deleted successfully! "
         })
     }).catch((error) => {
-        res.send({
-            message: error.message
-        })
-    })
-
-    router.delete('/deleterequest', (req, res) => {
-        Request.remove({email: req.body.email}).then((data) => {
-            res.send({
-                message: "Request deleted successfully! "
-            })
-        }).catch((error) => {
-            res.send({
-                message: error.message,
-            })
-        })
-    })
-    
-    router.put('/updaterequest', (req,res) => {
-        Request.updateOne(
-            {
-                email: req.body.email
-            },
-            {
-                $set: {
-                    ...req.body
-                }
+        res.status(500).send({
+            error: {
+                message: error.message
             }
-        ).then((data)=>{
-            Request.find({email: req.body.email}).then((data) => {
-                if(data.length !== 0)
-                    res.send(data)
-        })
-        }).catch((error)=>{
-            res.send({
-                message: error.message,
-            })
         })
     })
-        
-
-    
 })
     
 // router.get('/', (req, res) => {

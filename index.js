@@ -3,7 +3,8 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const mongoURL = require('./config/').mongoURL
 
-const user = require('./src/routes/userRoute')
+const donor = require('./src/routes/donorRoute')
+const receiver =require('./src/routes/receiverRoute')
 const post = require('./src/routes/postRoute')
 const story = require('./src/routes/storyRoute')
 const request = require('./src/routes/requestRoute')
@@ -18,7 +19,7 @@ app.use(bodyParser.json())
 mongoose.connect(mongoURL, {
     useNewUrlParser: true,
     useFindAndModify: false, 
-    useUnifiedToposlogy: true,
+    useUnifiedTopology: true,
 }).then(()=>{
     console.log("Database Successfully connected :)")
 }).catch((error)=>{
@@ -31,12 +32,13 @@ app.get('/',(req,res) => {
     res.send("Test")
 })
 
-app.use('/user', user)
-app.use('/post', post)
-app.use('/story', story)
-app.use('/request',request)
-app.use('/auth',auth)
-app.use('/guideline',guidelines)
+app.use('/api/donor', donor)
+app.use('/api/receiver',receiver)
+app.use('/api/post', post)
+app.use('/api/story', story)
+app.use('/api/request',request)
+app.use('/api/auth',auth)
+app.use('/api/guideline',guidelines)
 
 app.listen(PORT, () => {
     console.log(`The Server is running on port: ${PORT}`)

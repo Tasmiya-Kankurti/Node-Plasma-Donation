@@ -1,20 +1,21 @@
 const express = require('express');
 const router = express.Router()
-const User = require('../models/User')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const jwtSecret = require('../../config/').jwtSecret
-const { find } = require('../models/User')
+const Donor = require('../models/Donor')
+const Receiver = require('../models/Receiver')
 
-router.get('/',(req, res) => {
-    User.findOne({email: req.body.email}).then((data) => {
+router.post('/donorlogin',(req, res) => {
+    Donor.findOne({email: req.body.email}).then((data) => {
             if(data) {
                 bcrypt.compare(req.body.password, data._doc.password).then((result) => {
                     if(result){
                         delete data._doc.password
                         const accessToken = jwt.sign({
                             data: {
-                                email: req.body.email
+                                _id: data._id,
+                                userType: data.userType
                             }
                         }, jwtSecret) 
                         res.send({
@@ -23,26 +24,81 @@ router.get('/',(req, res) => {
                         })
 
                     } else {
-                        res.send({
-                            message: "Wrong password"
+                        res.status(401).send({
+                            error:{
+                                message: "Wrong email and password!"
+                            }
                         })
                     }
                 }).catch((error) => {
-                    res.send({
-                        message: error.message
+                    res.status(500).send({
+                        error: {
+                            message: error.message
+                        }
                     })
                 })
                 
             } else {
-                res.send({
-                    message: "Wrong email"
+                res.status(401).send({
+                    error:{
+                        message: "Wrong email and password!"
+                    }
                 })
             }
     }).catch((error) => {
-        res.send({
-            message: error.message
+        res.status(500).send({
+            error: {
+                message: error.message
+            }
         })
     })
 })
 
+router.post('/receiverlogin',(req, res) => {
+    Receiver.findOne({email: req.body.email}).then((data) => {
+            if(data) {
+                bcrypt.compare(req.body.password, data._doc.password).then((result) => {
+                    if(result){
+                        delete data._doc.password
+                        const accessToken = jwt.sign({
+                            data: {
+                                _id: data._id,
+                                userType: data.userType
+                            }
+                        }, jwtSecret) 
+                        res.send({
+                            accessToken,
+                            ...data._doc
+                        })
+
+                    } else {
+                        res.status(401).send({
+                            error:{
+                                message: "Wrong email and password!"
+                            }
+                        })
+                    }
+                }).catch((error) => {
+                    res.status(500).send({
+                        error: {
+                            message: error.message
+                        }
+                    })
+                })
+                
+            } else {
+                res.status(401).send({
+                    error:{
+                        message: "Wrong email and password!"
+                    }
+                })
+            }
+    }).catch((error) => {
+        res.status(500).send({
+            error: {
+                message: error.message
+            }
+        })
+    })
+})
 module.exports = router

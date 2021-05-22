@@ -5,25 +5,32 @@ const Guideline = require('../models/Guidelines')
 
 router.post('/createguideline', (req, res) => {
     const guideline = new Guideline({
-        data: req.body.data
+        info: req.body.info
     })
     guideline.save().then((data) => {
         res.send({
             message: "Guidlines added successfully!"
         })
     }).catch((error) => {
-        res.send({
-            message: error.message
+        res.status(500).send({
+            error: {
+                message: error.message
+            }
         })
     })
 })
 
 router.get('/',(req,res) => {
    Guideline.findOne().then((data) => {
-       if(data)
+       if(data){
         res.send({
             message: data
+        })   
+       } else {
+        res.send({
+            message: "Guidelines are not added yet!"
         })
+       }
    })
 })
 
@@ -34,16 +41,19 @@ router.put('/updateguideline',(req,res) => {
         },
         {
             $set: {
-                data: req.body.data
+                info: req.body.info
             }
         }
     ).then((data) => {
         res.send({
-            message: "Guidelines updated successfully!"
+            message: "Guidelines updated successfully!",
+            ...data._doc
         })
     }).catch((error) => {
-        res.send({
-            message: error.message
+        res.status(500).send({
+            error: {
+                message: error.message
+            }
         })
     })
    
