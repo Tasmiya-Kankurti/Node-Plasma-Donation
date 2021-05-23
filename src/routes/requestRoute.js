@@ -60,7 +60,18 @@ router.get('/requestbyid/:reqId', (req, res) => {
 })
 
 router.get('/search/:reqBG', (req,res) => {
-    Donor.find({bloodGroup: req.params.reqBG}).then((data)=>{
+    let matchingBloodGroups = []
+    if(req.params.reqBG === "A")
+        matchingBloodGroups = ["A", "AB"]
+    else if(req.params.reqBG === "B")
+        matchingBloodGroups = ["B", "AB"]
+    else if(req.params.reqBG === "AB")
+        matchingBloodGroups = ["AB"]
+    else 
+        matchingBloodGroups = ["O", "AB", "A", "B"]
+
+
+    Donor.find({bloodGroup: { $in: matchingBloodGroups}}).then((data)=>{
         if(data){
             res.send(data)
         } else {
