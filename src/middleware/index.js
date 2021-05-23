@@ -16,7 +16,7 @@ const isLoggedIn = (req, res, next) => {
         try {
             const payload = jwt.verify(token, jwtSecret)
             req.body.id = payload.data._id,
-            userType = payload.data.userType
+            req.body.userType = payload.data.userType
 
             next()
         }

@@ -7,7 +7,7 @@ const isLoggedIn = require('../middleware')
 
 
 router.get('/', (req, res) => {
-    Post.find().then((data) => {
+    Post.find().populate('donorId',['name', 'email','avatar','bloodGroup','address','mobile', 'reportsDates']).then((data) => {
         res.send(data)
     }).catch((error) => {
         res.status(500).send({
@@ -19,9 +19,18 @@ router.get('/', (req, res) => {
 })
 
 router.get('/mypost', isLoggedIn, (req, res) => {
-    Post.findOne({donorId: req.body.id}).populate('donorId',['name', 'email','avatar','bloodGroup','cityState','mobile']).then((data) => {
-        // console.log(data)
+    Post.findOne({donorId: req.body.id}).populate('donorId',['name', 'email','avatar','bloodGroup','address','mobile','reportsDates']).then((data) => {
+        if(data){
+             // console.log(data)
         res.send(data)
+        } else {
+            res.status(404).send({
+                error: {
+                    message: "You have not posted yet!"
+                }
+            })   
+        }
+       
     }).catch((error) => {
         res.status(500).send({
             error: {
@@ -32,7 +41,7 @@ router.get('/mypost', isLoggedIn, (req, res) => {
 })
 
 router.get('/postById/:posId', (req, res) => {
-    Post.findOne({_id: req.params.posId}).populate('donorId',['name', 'email','avatar','bloodGroup','cityState','mobile']).then((data) => {
+    Post.findOne({_id: req.params.posId}).populate('donorId',['name', 'email','avatar','bloodGroup','address','mobile','reportsDates']).then((data) => {
         if(data){
             // console.log(data)
             res.send(data)

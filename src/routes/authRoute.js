@@ -15,11 +15,12 @@ router.post('/donorlogin',(req, res) => {
                         const accessToken = jwt.sign({
                             data: {
                                 _id: data._id,
-                                userType: data.userType
+                                userType: "Donor"
                             }
                         }, jwtSecret) 
                         res.send({
                             accessToken,
+                            userType: "Donor",
                             ...data._doc
                         })
 
@@ -63,11 +64,12 @@ router.post('/receiverlogin',(req, res) => {
                         const accessToken = jwt.sign({
                             data: {
                                 _id: data._id,
-                                userType: data.userType
+                                userType: "Receiver"
                             }
                         }, jwtSecret) 
                         res.send({
                             accessToken,
+                            userType: "Receiver",
                             ...data._doc
                         })
 

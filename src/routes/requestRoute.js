@@ -6,7 +6,7 @@ const isLoggedIn = require('../middleware')
 // const request = require('../data/requestData')
 
 router.get('/', (req, res) => {
-    Request.find().then((data) => {
+    Request.find().populate('receiverId',['name', 'email','avatar','requiredBG','address','mobile']).then((data) => {
         res.send(data)
     }).catch((error) => {
         res.status(500).send({
@@ -18,9 +18,17 @@ router.get('/', (req, res) => {
 })
 
 router.get('/myrequest', isLoggedIn, (req, res) => {
-    Request.findOne({receiverId: req.body.id}).populate('receiverId',['name', 'email','avatar','requiredBG','cityState','mobile']).then((data) => {
-        // console.log(data)
-        res.send(data)
+    Request.findOne({receiverId: req.body.id}).populate('receiverId',['name', 'email','avatar','requiredBG','address','mobile']).then((data) => {
+        if(data){
+            // console.log(data)
+            res.send(data)
+       } else {
+           res.status(404).send({
+               error: {
+                   message: "You have not requested yet!"
+               }
+           })   
+       }
     }).catch((error) => {
         res.status(500).send({
             error: {
@@ -31,7 +39,7 @@ router.get('/myrequest', isLoggedIn, (req, res) => {
 })
 
 router.get('/requestbyid/:reqId', (req, res) => {
-    Request.findOne({_id: req.params.reqId}).populate('receiverId',['name', 'email','avatar','requiredBG','cityState','mobile']).then((data) => {
+    Request.findOne({_id: req.params.reqId}).populate('receiverId',['name', 'email','avatar','requiredBG','address','mobile']).then((data) => {
         if(data){
             // console.log(data)
             res.send(data)

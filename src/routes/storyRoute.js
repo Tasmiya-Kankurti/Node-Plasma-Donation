@@ -7,7 +7,7 @@ const isLoggedIn = require('../middleware')
 
 
 router.get('/', (req, res) => {
-    Story.find().then((data) => {
+    Story.find().populate('donorId',['name', 'email','avatar','bloodGroup','address','mobile']).then((data) => {
         res.send(data)
     }).catch((error) => {
         res.status(500).send({
@@ -19,9 +19,17 @@ router.get('/', (req, res) => {
 })
 
 router.get('/mystory', isLoggedIn, (req, res) => {
-    Story.findOne({donorId: req.body.id}).populate('donorId',['name', 'email','avatar','bloodGroup','cityState','mobile']).then((data) => {
-        console.log(data)
-        res.send(data)
+    Story.findOne({donorId: req.body.id}).populate('donorId',['name', 'email','avatar','bloodGroup','address','mobile']).then((data) => {
+        if(data){
+            // console.log(data)
+            res.send(data)
+       } else {
+           res.status(404).send({
+               error: {
+                   message: "You have not added story yet!"
+               }
+           })   
+       }
     }).catch((error) => {
         res.status(500).send({
             error: {
@@ -33,7 +41,7 @@ router.get('/mystory', isLoggedIn, (req, res) => {
 })
 
 router.get('/storyById/:styId', (req, res) => {
-    Story.findOne({_id: req.params.styId}).populate('donorId',['name', 'email','avatar','bloodGroup','cityState','mobile']).then((data) => {
+    Story.findOne({_id: req.params.styId}).populate('donorId',['name', 'email','avatar','bloodGroup','address','mobile']).then((data) => {
         if(data){
             // console.log(data)
             res.send(data)

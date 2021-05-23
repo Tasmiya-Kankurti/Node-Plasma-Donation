@@ -36,7 +36,7 @@ router.get('/myaccount', isLoggedIn, (req, res) => {
 })
 
 router.get('/donorbyid/:donorId', (req, res) => {
-    Donor.findOne({_id: req.params.donorId}).select('name email mobile bloodGroup cityState reportsDates').then((data) => {
+    Donor.findOne({_id: req.params.donorId}).select('name email avatar mobile bloodGroup address reportsDates').then((data) => {
         if(data){
             // console.log(data)
             res.send(data)
