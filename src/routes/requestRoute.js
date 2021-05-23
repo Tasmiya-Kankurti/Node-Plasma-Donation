@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const Request = require('../models/Request')
 const Donor =require('../models/Donor')
+const Receiver = require('../models/Receiver')
 const isLoggedIn = require('../middleware')
 // const request = require('../data/requestData')
 
@@ -99,9 +100,26 @@ router.post('/createrequest',isLoggedIn, (req, res) => {
                 receiverId: req.body.id
             })    
             request.save().then((data) => {
-                res.send({
-                    message: "Request added successfully!",
-                    ...data._doc
+                Receiver.updateOne(
+                    {
+                        _id: req.body.id
+                    },
+                    {
+                        $set: {
+                            isReceiver: true
+                        }
+                    }
+                ).then((ddata)=>{
+                            res.send({
+                                message: "Request added successfully!",
+                                ...data._doc
+                            })
+                }).catch((error) => {
+                    res.status(500).send({
+                        error: {
+                            message: error.message
+                        }     
+                    })
                 })
             }).catch((error) => {
                 res.status(500).send({
@@ -116,9 +134,35 @@ router.post('/createrequest',isLoggedIn, (req, res) => {
 
 router.delete('/deleterequest', isLoggedIn, (req, res) => {
     Request.remove({receiverId: req.body.id}).then((data) => {
-        res.send({
-            message: "request deleted successfully! "
-        })
+        if(data.deletedCount === 0){
+            res.status(401).send({
+                error: {
+                    message: "Wrong user Id! "
+                }
+            })
+        } else {
+            Receiver.updateOne(
+                {
+                    _id: req.body.id
+                },
+                {
+                    $set: {
+                        isReceiver: false
+                    }
+                }
+            ).then((ddata)=>{
+                        res.send({
+                            message: "Request deleted successfully!",
+                            ...data._doc
+                        })
+            }).catch((error) => {
+                res.status(500).send({
+                    error: {
+                        message: error.message
+                    }     
+                })
+            })
+        }
     }).catch((error) => {
         res.status(500).send({
             error: {

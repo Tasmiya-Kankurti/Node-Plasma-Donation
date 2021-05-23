@@ -2,6 +2,10 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const receiverSchema = new Schema({
+    isReceiver:{
+        type: Boolean,
+        default: false
+    },
     name: {
         type: String,
         required: true

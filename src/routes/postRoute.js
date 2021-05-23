@@ -18,6 +18,7 @@ router.get('/', (req, res) => {
     })
 })
 
+
 router.get('/mypost', isLoggedIn, (req, res) => {
     Post.findOne({donorId: req.body.id}).populate('donorId',['name', 'email','avatar','bloodGroup','address','mobile','reportsDates']).then((data) => {
         if(data){
@@ -71,12 +72,31 @@ router.post('/createpost',isLoggedIn, (req, res) => {
         } else {
             const post = new Post({
                 donorId: req.body.id
-            })    
+            })
+             
             post.save().then((data) => {
-                res.send({
-                    message: "Post added successfully! ",
-                    ...data._doc
+                Donor.updateOne(
+                    {
+                        _id: req.body.id
+                    },
+                    {
+                        $set: {
+                            isDonor: true
+                        }
+                    }
+                ).then((ddata)=>{
+                            res.send({
+                                message: "Post added successfully!",
+                                ...data._doc
+                            })
+                }).catch((error) => {
+                    res.status(500).send({
+                        error: {
+                            message: error.message
+                        }     
+                    })
                 })
+                
               
             }).catch((error) => {
                 res.status(500).send({
@@ -91,10 +111,36 @@ router.post('/createpost',isLoggedIn, (req, res) => {
 })
 
 router.delete('/deletepost', isLoggedIn, (req, res) => {
-    Donor.remove({donorId: req.body.id}).then((data) => {
-        res.send({
-            message: "Post deleted successfully! "
-        })
+    Post.remove({donorId: req.body.id}).then((data) => {
+        if(data.deletedCount === 0){
+            res.status(401).send({
+                error: {
+                    message: "Wrong user Id! "
+                }
+            })
+        } else {
+            Donor.updateOne(
+                {
+                    _id: req.body.id
+                },
+                {
+                    $set: {
+                        isDonor: false
+                    }
+                }
+            ).then((ddata)=>{
+                        res.send({
+                            message: "Post deleted successfully!",
+                            ...data._doc
+                        })
+            }).catch((error) => {
+                res.status(500).send({
+                    error: {
+                        message: error.message
+                    }     
+                })
+            })
+        }
     }).catch((error) => {
         res.status(500).send({
             error: {
